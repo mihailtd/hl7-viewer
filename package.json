@@ -1,0 +1,18 @@
+{
+  "name": "electron-hl7-viewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mihai Farcas",
+  "license": "ISC",
+  "dependencies": {
+    "alertify.js": "^1.0.12",
+    "font-awesome": "^4.6.3",
+    "jquery": "^3.1.0",
+    "normalize.css": "^4.2.0",
+    "simple-hl7": "^1.6.2"
+  }
+}
