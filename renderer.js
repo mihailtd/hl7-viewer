@@ -41,6 +41,12 @@ class Message {
   getAllSegments() {
     return msg.parse().segments.map(s => s.name);
   }
+  getSegmentData(seg) {
+    return msg.parse().seg;
+  }
+  getHeaderData() {
+    return msg.parse().header;
+  }
 }
 
 class Destination {
@@ -74,7 +80,11 @@ let msg = new Message();
 let messageBox = $('#message');
 
 messageBox.on('DOMSubtreeModified', () => {
-  console.log(msg.text);
+  let segments = messageBox.children('p');
+  segments.on('click', function (evt) {
+    evt.stopImmediatePropagation();
+    $('.tabs').children()[$(this).index()].children[0].checked = true
+  });
 });
 
 let refreshViews = (view) => {
@@ -102,14 +112,60 @@ $('#paste').on('click', () => {
   messageBox.html(formatHl7(text));
   msg.text = text;
   constructHeaders(msg.getAllSegments());
+  constructMshData(msg.getHeaderData());
+  msg.parse().segments.forEach((seg, i) => {
+    constructSegmentData(seg, i);
+  });
 });
 
+let constructMshData = header => {
+  let html = ``;
+  header.fields.forEach((f, i) => {
+    f.value[0].forEach((v, j) => {
+      html += `<p>Segment ${i}.${j} has a value of ${v.value[0]}</p>`
+    })
+
+  });
+  $('#MSH').siblings('.tab-content').html(html);
+}
+
+let constructSegmentData = (seg, i) => {
+  let html = ``;
+  let contentDiv = $(`#SEG${i}`);
+  let fields = seg.fields;
+
+  fields.forEach((f, j) => {
+    f.value.forEach((v, k) => {
+      if (v.value) {
+        v.value.forEach((v, m) => {
+          v.forEach((c, n) => {
+            html += `<p>Segment ${i}-${j}.${k}.${m}.${n} has a value of ${c.value[0]}</p>`;
+            return;
+          })
+        });
+      }
+      if (v.length === 1) {
+        html += `<p>Segment ${i}-${j}.${k} has a value of ${v[0].value[0]}</p>`;
+        return;
+      }
+      if (v.length > 1) {
+        v.forEach((c, l) => {
+          html += `<p>Segment ${i}-${j}.${k}.${l} has a value of ${c.value[0]}</p>`;
+          return;
+        })
+      }
+    });
+  });
+  contentDiv.siblings('.tab-content').html(html);
+}
 
 let constructHeaders = headers => {
-  let html;
-  headers.forEach( (h, i) => {
+  $('.tab:first').nextAll('.tab').remove();
+  let html = ``;
+  headers.forEach((h, i) => {
     html += `<div class="tab"><input name="css-tabs" type="radio" class="tab-switch" id="SEG${i}">
     <label for="SEG${i}" class="tab-label">${h}</label>
+    <div class="tab-content"></div>
       </div>`
   });
   $('.tabs').append(html);

@@ -1,3 +1,7 @@
+html {
+  height: 100%;
+}
+
 body {
   --main-background-color: #2d374b;
   --main-text-color: #abd9f5;
@@ -9,6 +13,7 @@ body {
   font-size: 1.125rem;
   line-height: 1.618rem;
   color: var(--main-text-color);
+  height: 100%;
 
   background: var(--main-background-color);
 }
@@ -221,6 +226,8 @@ div[class^='curve_'] {
   top: 2.75em;
   left: 0;
   height: 12rem;
+  display: inline-table;
+  width: 95.9%;
 }
 .tab-switch:checked + label + .tab-content {
   z-index: 2;
@@ -263,4 +270,7 @@ div[class^='curve_'] {
 .tab-label:hover {
   top: -0.25rem;
   transition: top 0.25s;
+}
+.alertify-logs {
+  z-index: 99;
 }
