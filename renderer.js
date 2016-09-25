@@ -97,12 +97,21 @@ let addEvents = (segments) => {
   segments.on('click', function (evt) {
     evt.stopImmediatePropagation();
     lastActive = $(this).index();
-    setActive($(this).index());
+    setActive(lastActive);
   });
 }
 
 let setActive = (i) => {
-  $('.tabs').children()[i].children[0].checked = true;
+  if (!i) {
+    i = 0;
+  }
+  let lastActiveTab = $('.tabs').children()[i];
+  if (!lastActiveTab) {
+    lastActiveTab = $('.tabs').children()[0];
+    lastActiveTab.children[0].checked = true;
+    return;
+  }
+  lastActiveTab.children[0].checked = true;
 }
 
 
@@ -135,6 +144,7 @@ let getTextFromMessageBox = () => {
 
 
 $('#open').on('click', () => {
+  lastActive = '0';
   dialog.showOpenDialog({ title: "Open Message", properties: ['openFile'], filters: [{ name: 'hl7 messages', extensions: ['hl7', 'txt'] }] }, path => {
     console.log(path);
     if (!path) {
@@ -152,11 +162,7 @@ $('#open').on('click', () => {
         return alertify.error("Not a valid HL7 message!");
       }
       messageBox.html(formatHl7(data));
-      constructHeaders(msg.getAllSegments());
-      constructMshData(msg.getHeaderData());
-      msg.parse().segments.forEach((seg, i) => {
-        constructSegmentData(seg, i);
-      });
+      refreshViews();
       alertify.success("File opened!");
     });
   });
@@ -191,21 +197,26 @@ $('#send').on('click', () => {
 });
 
 $('#paste').on('click', () => {
+  lastActive = '0';
   let text = clipboard.readText();
   msg.text = text;
+  messageBox.children().remove();
   messageBox.html(formatHl7(text));
   refreshViews();
+  removeEmptyParagraphs(messageBox);
   $('#MSH').prop("checked", true);
 });
 
 let constructMshData = header => {
   $('#detailTableMSH tbody').children().remove();
-
   let html = ``;
   header.fields.forEach((f, i) => {
+    if(!f.value[0]){
+      return;
+    }
     f.value[0].forEach((v, j) => {
       html += `<tr><td>MSH-${i + 3}.${j + 1}</td><td>${v.value[0]}</td><td>Testing</td></tr>`
-    })
+    });
   });
   $('#detailTableMSH tbody').append(html);
 }
@@ -270,4 +281,15 @@ let formatHl7 = text => {
     .split('\\').join('<span style="font-weight: 800; font-size: 1.5em; color: #666">\\</span>')
     .split('&').join('<span style="font-weight: 800; font-size: 1.5em; color: #666">&</span>')
     .split('\n').join('</p><p>');
+}
+
+let removeEmptyParagraphs = el => {
+  if (!el.children('p')) {
+    return;
+  }
+  el.children('p').each(function () {
+    if ('' === $.trim($(this).text())) {
+      $(this).remove();
+    }
+  });
 }
