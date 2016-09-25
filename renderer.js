@@ -3,10 +3,12 @@
 // All of the Node.js APIs are available in this process.
 'use strict'
 const $ = require('jquery');
-const {clipboard} = require('electron')
+const {clipboard, ipcRenderer} = require('electron');
+const {dialog} = require('electron').remote;
 const alertify = require('alertify.js');
 const hl7 = require('simple-hl7');
 const parser = new hl7.Parser({ segmentSeperator: '\n' });
+const fs = require('fs');
 
 
 class Message {
@@ -83,9 +85,20 @@ messageBox.on('DOMSubtreeModified', () => {
   let segments = messageBox.children('p');
   segments.on('click', function (evt) {
     evt.stopImmediatePropagation();
-    $('.tabs').children()[$(this).index()].children[0].checked = true
+    $('.tabs').children()[$(this).index()].children[0].checked = true;
   });
 });
+
+messageBox.on('focus', () => {
+  ipcRenderer.send('events', 'focused');
+});
+messageBox.on('blur', () => {
+  ipcRenderer.send('events', 'blurred');
+});
+ipcRenderer.on('events', (event, arg) => {
+  if(arg === 'pressed');
+  $('#paste').click();
+})
 
 let refreshViews = (view) => {
 
@@ -99,8 +112,53 @@ let getTextFromMessageBox = () => {
   return $('#message').val();
 }
 
+
+$('#open').on('click', () => {
+  dialog.showOpenDialog({ title: "Open Message", properties: ['openFile'], filters: [{ name: 'hl7 messages', extensions: ['hl7', 'txt'] }] }, path => {
+    if (!path[0]) {
+      return alertify.log("No file selected!");
+    }
+    fs.readFile(path[0], 'utf8', (err, data) => {
+      if (err) {
+        return alertify.error(`Error reading file! ${err}`);
+      }
+      if (!data) {
+        return alertify.log("Empty file!");
+      }
+      msg.text = data;
+      if (msg.parse().header.fields.length === 0) {
+        return alertify.error("Not a valid HL7 message!");
+      }
+      messageBox.html(formatHl7(data));
+      constructHeaders(msg.getAllSegments());
+      constructMshData(msg.getHeaderData());
+      msg.parse().segments.forEach((seg, i) => {
+        constructSegmentData(seg, i);
+      });
+      alertify.success("File opened!");
+    });
+  });
+});
+
 $('#save').on('click', () => {
-  alertify.success("Saved");
+  let messageText = $('#message').text();
+  if (!messageText.trim().length) {
+    return alertify.log("No message text!");
+  }
+  if (msg.parse().header.fields.length === 0) {
+    return alertify.error("Not a valid HL7 message!");
+  }
+  dialog.showSaveDialog({ title: "Save Message", filters: [{ name: 'hl7 messages', extensions: ['hl7'] }, { name: 'txt', extensions: ['txt'] }] }, path => {
+    if (!path) {
+      return alertify.log("No file saved!");
+    }
+    fs.writeFile(path, messageText, err => {
+      if (err) {
+        return alertify.error(`Error writing file! ${err}`);
+      }
+      return alertify.success("File saved!");
+    })
+  });
 });
 
 $('#send').on('click', () => {
@@ -109,13 +167,15 @@ $('#send').on('click', () => {
 
 $('#paste').on('click', () => {
   let text = clipboard.readText();
-  messageBox.html(formatHl7(text));
   msg.text = text;
+
+  messageBox.html(formatHl7(text));
   constructHeaders(msg.getAllSegments());
   constructMshData(msg.getHeaderData());
   msg.parse().segments.forEach((seg, i) => {
     constructSegmentData(seg, i);
   });
+  $('#MSH').prop("checked", true);
 });
 
 let constructMshData = header => {
