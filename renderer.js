@@ -7,8 +7,11 @@ const {clipboard, ipcRenderer} = require('electron');
 const {dialog} = require('electron').remote;
 const alertify = require('alertify.js');
 const hl7 = require('simple-hl7');
+var server = hl7.Server;
+
 const parser = new hl7.Parser({ segmentSeperator: '\n' });
 const fs = require('fs');
+
 
 
 class Message {
@@ -80,14 +83,28 @@ class Destination {
 
 let msg = new Message();
 let messageBox = $('#message');
+let lastActive = '0';
 
 messageBox.on('DOMSubtreeModified', () => {
+  msg.text = messageBox.text();
+  refreshViews();
   let segments = messageBox.children('p');
+  addEvents(segments);
+  setActive(lastActive);
+});
+
+let addEvents = (segments) => {
   segments.on('click', function (evt) {
     evt.stopImmediatePropagation();
-    $('.tabs').children()[$(this).index()].children[0].checked = true;
+    lastActive = $(this).index();
+    setActive($(this).index());
   });
-});
+}
+
+let setActive = (i) => {
+  $('.tabs').children()[i].children[0].checked = true;
+}
+
 
 messageBox.on('focus', () => {
   ipcRenderer.send('events', 'focused');
@@ -96,12 +113,16 @@ messageBox.on('blur', () => {
   ipcRenderer.send('events', 'blurred');
 });
 ipcRenderer.on('events', (event, arg) => {
-  if(arg === 'pressed');
+  if (arg === 'pressed');
   $('#paste').click();
 })
 
-let refreshViews = (view) => {
-
+let refreshViews = () => {
+  constructHeaders(msg.getAllSegments());
+  constructMshData(msg.getHeaderData());
+  msg.parse().segments.forEach((seg, i) => {
+    constructSegmentData(seg, i);
+  });
 }
 
 let setMessageSegmentValue = (msg, seg, val) => {
@@ -115,7 +136,8 @@ let getTextFromMessageBox = () => {
 
 $('#open').on('click', () => {
   dialog.showOpenDialog({ title: "Open Message", properties: ['openFile'], filters: [{ name: 'hl7 messages', extensions: ['hl7', 'txt'] }] }, path => {
-    if (!path[0]) {
+    console.log(path);
+    if (!path) {
       return alertify.log("No file selected!");
     }
     fs.readFile(path[0], 'utf8', (err, data) => {
@@ -162,60 +184,69 @@ $('#save').on('click', () => {
 });
 
 $('#send').on('click', () => {
+  var tcpClient = server.createTcpClient();
+  tcpClient.connect('127.0.0.1', 6661);
+  tcpClient.send(msg.text);
   alertify.success("Sent");
 });
 
 $('#paste').on('click', () => {
   let text = clipboard.readText();
   msg.text = text;
-
   messageBox.html(formatHl7(text));
-  constructHeaders(msg.getAllSegments());
-  constructMshData(msg.getHeaderData());
-  msg.parse().segments.forEach((seg, i) => {
-    constructSegmentData(seg, i);
-  });
+  refreshViews();
   $('#MSH').prop("checked", true);
 });
 
 let constructMshData = header => {
+  $('#detailTableMSH tbody').children().remove();
+
   let html = ``;
   header.fields.forEach((f, i) => {
     f.value[0].forEach((v, j) => {
-      html += `<p>Segment ${i}.${j} has a value of ${v.value[0]}</p>`
+      html += `<tr><td>MSH-${i + 3}.${j + 1}</td><td>${v.value[0]}</td><td>Testing</td></tr>`
     })
-
   });
-  $('#MSH').siblings('.tab-content').html(html);
+  $('#detailTableMSH tbody').append(html);
 }
 
 let constructSegmentData = (seg, i) => {
-  let html = ``;
+  let html = ` <table>
+            <thead>
+              <tr>
+                <th>Segment</th>
+                <th>Value</th>
+                <th>Standard</th>
+              </tr>
+            </thead>
+            <tbody>`;
   let contentDiv = $(`#SEG${i}`);
   let fields = seg.fields;
-
+  let name = seg.name;
   fields.forEach((f, j) => {
     f.value.forEach((v, k) => {
       if (v.value) {
         v.value.forEach((v, m) => {
           v.forEach((c, n) => {
-            html += `<p>Segment ${i}-${j}.${k}.${m}.${n} has a value of ${c.value[0]}</p>`;
+            html += `<tr><td>${name}-${j + 1}.${k + 1}.${m + 1 + n}</td><td>${c.value[0]}</td><td>Testing</td></tr>`;
             return;
           })
         });
       }
       if (v.length === 1) {
-        html += `<p>Segment ${i}-${j}.${k} has a value of ${v[0].value[0]}</p>`;
+        html += `<tr><td>${name}-${j + 1}.${k + 1}</td><td>${v[0].value[0]}</td><td>Testing</td></tr>`;
         return;
       }
       if (v.length > 1) {
         v.forEach((c, l) => {
-          html += `<p>Segment ${i}-${j}.${k}.${l} has a value of ${c.value[0]}</p>`;
+          html += `<tr><td>${name}-${j + 1}.${k + 1 + l}</td><td>${c.value[0]}</td><td>Testing</td></tr>`;
           return;
         })
       }
     });
   });
+  html += `</tbody>
+          </table>`
   contentDiv.siblings('.tab-content').html(html);
 }
 
@@ -232,7 +263,7 @@ let constructHeaders = headers => {
 }
 
 let formatHl7 = text => {
-  return '<p>' + text
+  return '<p tabindex="1">' + text
     .split('|').join('<span style="font-weight: 800; font-size: 1.5em; color: #666">|</span>')
     .split('^').join('<span style="font-weight: 800; font-size: 1.5em; color: #666">^</span>')
     .split('~').join('<span style="font-weight: 800; font-size: 1.5em; color: #666">~</span>')

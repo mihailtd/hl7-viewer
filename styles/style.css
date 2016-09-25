@@ -3,6 +3,7 @@ html {
 }
 
 body {
+  --scale: 1;
   --main-background-color: #2d374b;
   --main-text-color: #abd9f5;
   --main-accent-color: #666;
@@ -20,7 +21,7 @@ body {
 
 a {
   color: var(--main-link-button-color);
-  color: var(--main-text-color);; 
+  color: var(--main-text-color);
   text-decoration: none;
 }
 
@@ -201,15 +202,13 @@ div[class^='curve_'] {
 
 .details {
   box-sizing: border-box;
-  max-width: 75rem;
-  width: 100%;
-  margin: 0 auto;
+  height: auto;
+  width: 60rem;
+  margin: auto auto;
 }
 .tabs {
   position: relative;
   margin: 3rem 0;
-  background: var(--main-link-button-color);
-  height: 14.75rem;
 }
 .tab-switch {
   display: none;
@@ -223,20 +222,19 @@ div[class^='curve_'] {
   opacity: 0;
   transition: all 0.35s;
   position: absolute;
-  top: 2.75em;
-  left: 0;
-  height: 12rem;
+  top: 0;
   display: inline-table;
-  width: 95.9%;
+  left: 6rem;
+  width: 51rem;
 }
 .tab-switch:checked + label + .tab-content {
   z-index: 2;
   opacity: 1;
   transition: all 0.35s;
 }
-.tab {
+/*.tab {
   float: left;
-}
+}*/
 .tabs::before,
 .tabs::after {
   content: "";
@@ -251,26 +249,46 @@ div[class^='curve_'] {
   line-height: 2.75em;
   padding: 0 1.618em;
   background: var(--main-link-button-color);
-  border-right: 0.125rem solid var(--secondary-accent-color);
+  border-bottom: 0.125rem solid var(--secondary-accent-color);
   color: var(--main-text-color);
   cursor: pointer;
   top: 0;
   transition: all 0.25s;
   height: 3em;
+  width: 3rem;
 }
 .tab-switch:checked + .tab-label{
   background: var(--main-accent-color);
   color: var(--main-text-color);
-  border-bottom: 0;
-  border-right: 0.125rem solid var(--secondary-accent-color);
+  border-right: 0;
+  border-bottom: 0.125rem solid var(--secondary-accent-color);
   transition: all 0.35s;
   z-index: 1;
-  top: -0.0625rem;
+  left: -0.0625rem;
 }
 .tab-label:hover {
-  top: -0.25rem;
+  left: -0.25rem;
   transition: top 0.25s;
 }
 .alertify-logs {
   z-index: 99;
+}
+
+td, th {
+    border: 1px solid var(--main-link-button-color);
+    padding: 8px;
+    width: 51rem;
+}
+tr:nth-child(even) {
+  background-color: var(--main-background-color);
+}
+tr:hover {
+  background-color: var(--secondary-accent-color);
+}
+th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: var(--main-link-button-color);
+  color: var(--main-text-color);
 }
