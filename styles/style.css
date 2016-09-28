@@ -29,7 +29,33 @@ a {
 /* 
 * buttons 
 */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--main-link-button-color);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+.dropdown-content a {
+    color: var(--main-text-color);
+    padding: 1em 1.2em;
+    text-decoration: none;
+    display: inherit;
+}
+.dropdown:hover .dropdown-content {
+    display: inherit;
+}
+.dropdown-content a:hover {
+  background-color: var(--secondary-accent-color);
+}
+
+
 button {
+  display: inline-block;
   font-size: 1.7em;
   background:  var(--main-link-button-color);
   color: var(--main-text-color);
@@ -180,21 +206,18 @@ div[class^='curve_'] {
   border: 0.25rem var(--secondary-accent-color) solid;
 }
 
-#message::-webkit-scrollbar-track
-{
+body::-webkit-scrollbar-track, #message::-webkit-scrollbar-track {
 	box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	border-radius: 10px;
 	background-color: var(--main-background-color);
 }
 
-#message::-webkit-scrollbar
-{
+body::-webkit-scrollbar, #message::-webkit-scrollbar {
 	width: 12px;
 	background-color: var(--main-background-color);
 }
 
-#message::-webkit-scrollbar-thumb
-{
+body::-webkit-scrollbar-thumb, #message::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: var(--secondary-accent-color);

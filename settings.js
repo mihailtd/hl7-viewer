@@ -19,6 +19,7 @@ $(document).ready(() => {
       if (!destinationName) { return alertify.error("Please Provide a Name!"); }
       if (!destinationIp) { return alertify.error("Please Provide an Ip!"); }
       if (!destinationPort) { return alertify.error("Please Provide a Port!"); }
+
       let destination = {
         'name': destinationName,
         'ip': destinationIp,
@@ -29,9 +30,9 @@ $(document).ready(() => {
       refreshDestinations();
       alertify.success("Destination Added!");
     });
-    $('.edit').on('click', function () {
-      alertify.success("Edit Successful");
-    });
+    // $('.edit').on('click', function () {
+    //   alertify.success("Edit Successful");
+    // });
     $('.delete').on('click', function () {
       let index = $(this).data('data-destination');
       destinations.splice(index, 1);
@@ -50,7 +51,6 @@ $(document).ready(() => {
       <td>${dest.ip}</td>
       <td>${dest.port}</td>
       <td>
-      <button class="grow_spin edit" data-destination="${i}"><i class="fa fa-pencil" aria-hidden="true"></i></button>
       <button class="grow_spin delete" data-destination="${i}"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
       </td>
       </tr>`
@@ -79,11 +79,8 @@ $(document).ready(() => {
 
   $('#scale').text(uiScale);
 
-  $('#cancel').on('click', () => {
+  $('#close').on('click', () => {
     ipcRenderer.send('events', 'settings-close');
-  });
-  $('#apply').on('click', () => {
-    ipcRenderer.send('events', 'settings-apply');
   });
 });
 

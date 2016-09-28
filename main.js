@@ -9,7 +9,7 @@ let child;
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({ width: 1200, height: 800 })
-  child = new BrowserWindow({ parent: win, show: false, closable: false, title: 'Settings', autoHideMenuBar: true, maximizable: false, minimizable: false });
+  child = new BrowserWindow({width: 900, height: 650, parent: win, show: false, closable: false, title: 'Settings', autoHideMenuBar: true, maximizable: false, minimizable: false });
 
   // and load the index.html of the app.
   win.loadURL(`file://${__dirname}/index.html`)
@@ -57,10 +57,6 @@ app.on('ready', () => {
     }
     if (arg === 'settings-close') {
       child.hide();
-    }
-    if (arg === 'settings-apply') {
-      child.hide();
-      event.sender.send('events', 'settings-apply');
     }
   })
 })

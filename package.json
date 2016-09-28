@@ -1,9 +1,10 @@
 {
-  "name": "electron-hl7-viewer",
-  "version": "1.0.0",
+  "name": "hl7-viewer",
+  "version": "0.9.0b",
   "description": "",
   "main": "main.js",
   "scripts": {
+    "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mihai Farcas",
@@ -15,5 +16,9 @@
     "nconf": "^0.8.4",
     "normalize.css": "^4.2.0",
     "simple-hl7": "^1.6.2"
+  },
+  "devDependencies": {
+    "electron-packager": "^8.0.0",
+    "electron-prebuilt": "^1.4.1"
   }
 }

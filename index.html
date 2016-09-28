@@ -14,44 +14,50 @@
   <div class="button_group">
     <button class="grow_spin" id="open"><i class="fa fa-folder-open" aria-hidden="true"></i> Open</button>
     <button class="grow_spin" id="paste"><i class="fa fa-clipboard" aria-hidden="true"></i> Paste</button>
-    <button class="grow_spin" id="settings"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
     <button class="grow_spin" id="save"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
-    <button class="grow_spin" id="send"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
-  </div>
+    <div class="dropdown">
+      <button class="grow_spin" id="send"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
+      <div class="dropdown-content">
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+      </div>
+    </div>
+    <button class="grow_spin" id="settings"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
 
-  <div id="message" class="message_box" contenteditable>
-  </div>
+    <div id="message" class="message_box" contenteditable>
+    </div>
 
-  <div class="details">
-    <div class="tabs">
-      <div class="tab"><input name="css-tabs" type="radio" checked class="tab-switch" id="MSH">
-        <label for="MSH" class="tab-label">MSH</label>
-        <div class="tab-content">
-          <table id="detailTableMSH">
-            <thead>
-              <tr>
-                <th>Segment</th>
-                <th>Value</th>
-                <th>Standard</th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
+    <div class="details">
+      <div class="tabs">
+        <div class="tab"><input name="css-tabs" type="radio" checked class="tab-switch" id="MSH">
+          <label for="MSH" class="tab-label">MSH</label>
+          <div class="tab-content">
+            <table id="detailTableMSH">
+              <thead>
+                <tr>
+                  <th>Segment</th>
+                  <th>Value</th>
+                  <th>Standard</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="spinner">
-    <!--<div class="curve_top_left"></div>-->
-    <!--<div class="curve_bottom_right"></div>-->
-    <div class="curve_top_right"></div>
-    <div class="curve_bottom_left"></div>
-    <div class="center_circle"></div>
-  </div>
+    <div class="spinner">
+      <!--<div class="curve_top_left"></div>-->
+      <!--<div class="curve_bottom_right"></div>-->
+      <div class="curve_top_right"></div>
+      <div class="curve_bottom_left"></div>
+      <div class="center_circle"></div>
+    </div>
 
-  <script src="./renderer.js"></script>
+    <script src="./renderer.js"></script>
 
 </body>
 
