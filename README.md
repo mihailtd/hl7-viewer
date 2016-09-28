@@ -1,6 +1,8 @@
 # HL7 Viewer
 
-## Features
+
+## Features:
+
 * Easily see a clear formatted HL7 message.
 * Nice user interface, with light and dark theme.
 * Very responsive, real time edits of the messages.
@@ -8,6 +10,11 @@
 for testing environments and more. You can setup and save destinations that can have aliases for easy 
 reference.
 * Quickly open or save your edited file to the disk. You can open .hl7 and .txt files. 
+
+## What's new:
+
+* Fixed the send dropdown display and styles. 
+* Dynamically loading the TCP destinatios that you setup in the settings window.
 
 ## Known issues and unfinished features in this beta version:
 
@@ -25,17 +32,17 @@ screens. In the future there will be a slider to adjust the scale of the UI elem
 * Proper installers and releases for linux and mac are coming soon. For now the beta version is available 
 only on Windows systems.
 
-## Installation
+## Installation instructions:
 
-* Download the .rar [file](./packages/electron-hl7-viewer-win32-x64.rar).
+* Download the .rar [file](./packages/).
 * Extract to a folder.
-* Run `electron-hl7-viewer.exe`.
+* Run `hl7-viewer.exe`.
 * This version does not yet have automatic updates. Make sure to check this repo regurarly for 
 possible updates.
 
 
-
 I am trying to solve problems that I encounter daily, make the process of debugging and testing 
-with hl7 messages a fast and seamless process. I hope this application will help professionals in the medical industry, and others.
+with hl7 messages a fast and seamless process. I hope this application will help professionals 
+in the healthcare community, and others.
 
 ### Thank you!

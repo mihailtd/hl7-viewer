@@ -8,11 +8,29 @@ const {dialog} = require('electron').remote;
 const alertify = require('alertify.js');
 const hl7 = require('simple-hl7');
 var server = hl7.Server;
+var configuration = require('./configuration');
 
 const parser = new hl7.Parser({ segmentSeperator: '\n' });
 const fs = require('fs');
+let tcpClient = server.createTcpClient();
 
 
+let refreshDestinations = () => {
+  let destinations = configuration.readSettings('tcp-destinations');
+  let html = '';
+  destinations.forEach((dest, i) => {
+    html += `<a href="#" data-destination="${i}">${dest.name}</a>`
+  });
+
+  $('.dropdown-content').html(html);
+  $('.dropdown-content').find('a').on('click', function (event) {
+    let i = $(this).data('destination');
+    tcpClient.connect(destinations[i].ip, destinations[i].port);
+    tcpClient.send(msg.text);
+    alertify.success(`Message sent to ${destinations[i].name}`);
+  });
+}
+refreshDestinations();
 
 class Message {
   constructor() {
@@ -88,8 +106,6 @@ let setActive = (i) => {
 }
 
 
-
-
 let refreshViews = () => {
   constructHeaders(msg.getAllSegments());
   constructMshData(msg.getHeaderData());
@@ -152,12 +168,11 @@ $('#save').on('click', () => {
   });
 });
 
-$('#send').on('click', () => {
-  var tcpClient = server.createTcpClient();
-  tcpClient.connect('127.0.0.1', 6661);
-  tcpClient.send(msg.text);
-  alertify.success("Sent");
-});
+// $('#send').on('click', () => {
+//   tcpClient.connect('127.0.0.1', 6661);
+//   tcpClient.send(msg.text);
+//   alertify.success("Sent");
+// });
 
 $('#paste').on('click', () => {
   lastActive = '0';
@@ -174,7 +189,7 @@ let constructMshData = header => {
   $('#detailTableMSH tbody').children().remove();
   let html = ``;
   header.fields.forEach((f, i) => {
-    if(!f.value[0]){
+    if (!f.value[0]) {
       return;
     }
     f.value[0].forEach((v, j) => {
@@ -267,12 +282,12 @@ messageBox.on('blur', () => {
   ipcRenderer.send('events', 'blurred');
 });
 ipcRenderer.on('events', (event, arg) => {
-  console.log(arg);
-  if (arg === 'pressed'){
+  if (arg === 'pressed') {
     $('#paste').click();
     return;
   }
-  if( arg === 'settings-apply'){
-    alertify.success("Settings Saved and Applied");
+  if (arg === 'settings-close') {
+    return refreshDestinations();
+    // alertify.success("Settings Saved and Applied");
   }
-})
+});

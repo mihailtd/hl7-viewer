@@ -56,6 +56,7 @@ app.on('ready', () => {
       child.show();
     }
     if (arg === 'settings-close') {
+      win.webContents.send('events', 'settings-close');
       child.hide();
     }
   })
