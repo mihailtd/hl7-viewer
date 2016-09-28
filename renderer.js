@@ -54,33 +54,6 @@ class Message {
   }
 }
 
-class Destination {
-  constructor(ip, port) {
-    this._ip = ip;
-    this._port = port;
-  }
-
-  get port() {
-    return this._port;
-  }
-
-  set port(port) {
-    this._port = port;
-  }
-
-  get ip() {
-    return this._ip;
-  }
-
-  set ip(ip) {
-    this._ip = ip;
-  }
-
-  save() {
-
-  }
-}
-
 let msg = new Message();
 let messageBox = $('#message');
 let lastActive = '0';
@@ -115,16 +88,7 @@ let setActive = (i) => {
 }
 
 
-messageBox.on('focus', () => {
-  ipcRenderer.send('events', 'focused');
-});
-messageBox.on('blur', () => {
-  ipcRenderer.send('events', 'blurred');
-});
-ipcRenderer.on('events', (event, arg) => {
-  if (arg === 'pressed');
-  $('#paste').click();
-})
+
 
 let refreshViews = () => {
   constructHeaders(msg.getAllSegments());
@@ -146,7 +110,6 @@ let getTextFromMessageBox = () => {
 $('#open').on('click', () => {
   lastActive = '0';
   dialog.showOpenDialog({ title: "Open Message", properties: ['openFile'], filters: [{ name: 'hl7 messages', extensions: ['hl7', 'txt'] }] }, path => {
-    console.log(path);
     if (!path) {
       return alertify.log("No file selected!");
     }
@@ -293,3 +256,23 @@ let removeEmptyParagraphs = el => {
     }
   });
 }
+
+$('#settings').on('click', () => {
+  ipcRenderer.send('events', 'settings-open');
+});
+messageBox.on('focus', () => {
+  ipcRenderer.send('events', 'focused');
+});
+messageBox.on('blur', () => {
+  ipcRenderer.send('events', 'blurred');
+});
+ipcRenderer.on('events', (event, arg) => {
+  console.log(arg);
+  if (arg === 'pressed'){
+    $('#paste').click();
+    return;
+  }
+  if( arg === 'settings-apply'){
+    alertify.success("Settings Saved and Applied");
+  }
+})

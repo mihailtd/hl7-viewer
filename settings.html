@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Settings</title>
+  <link rel="stylesheet" href="./node_modules/normalize.css/normalize.css">
+  <link rel="stylesheet" href="./node_modules/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="./styles/style.css">
+</head>
+
+<body>
+  <h1>Settings</h1>
+  <p>Theme:
+    <input type="radio" name="theme" value="dark">
+    <label for="dark">Dark</label>
+    <input type="radio" name="theme" value="light" disabled="true">
+    <label for="light">Light</label>
+  </p>
+  <p>UI Scale: <span id="scale"></span></p>
+  <p>TCP Destinations: </p>
+  <table id="destinations" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>IP</th>
+                <th>Port</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+  <button class="grow_spin" id="apply"><i class="fa fa-floppy-o" aria-hidden="true"></i> Apply</button>
+  <button class="grow_spin" id="cancel"><i class="fa fa-ban" aria-hidden="true"></i> Cancel</button>
+
+  <script src="./settings.js"></script>
+</body>
+
+</html>

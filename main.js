@@ -1,15 +1,19 @@
-const {app, BrowserWindow, globalShortcut, ipcMain} = require('electron')
+const {app, BrowserWindow, globalShortcut, ipcMain, webContents} = require('electron');
+var configuration = require('./configuration');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win
+let win;
+let child;
 
 function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 600 })
+  win = new BrowserWindow({ width: 1200, height: 800 })
+  child = new BrowserWindow({ parent: win, show: false, closable: false, title: 'Settings', autoHideMenuBar: true, maximizable: false, minimizable: false });
 
   // and load the index.html of the app.
   win.loadURL(`file://${__dirname}/index.html`)
+  child.loadURL(`file://${__dirname}/settings.html`)
 
   // Open the DevTools.
   win.webContents.openDevTools()
@@ -19,14 +23,25 @@ function createWindow() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    win = null
-  })
+    child = null;
+    win = null;
+  });
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
+  if (!configuration.readSettings('theme')) {
+    configuration.saveSettings('theme', 'dark');
+  }
+  if (!configuration.readSettings('ui-scale')) {
+    configuration.saveSettings('ui-scale', 1);
+  }
+  if (!configuration.readSettings('tcp-destinations')) {
+    configuration.saveSettings('tcp-destinations', [{'name': 'Mirth (Default)', 'ip': '127.0.0.1', 'port': 6661}]);
+  }
+
   createWindow();
   ipcMain.on('events', (event, arg) => {
     if (arg === 'focused') {
@@ -36,6 +51,16 @@ app.on('ready', () => {
     }
     if (arg === 'blurred') {
       globalShortcut.unregister('CommandOrControl+V')
+    }
+    if (arg === 'settings-open') {
+      child.show();
+    }
+    if (arg === 'settings-close') {
+      child.hide();
+    }
+    if (arg === 'settings-apply') {
+      child.hide();
+      event.sender.send('events', 'settings-apply');
     }
   })
 })
