@@ -7,13 +7,17 @@ const {clipboard, ipcRenderer} = require('electron');
 const {dialog} = require('electron').remote;
 const alertify = require('alertify.js');
 const hl7 = require('simple-hl7');
-var server = hl7.Server;
-var configuration = require('./configuration');
+const hl7Definitons = require('hl7-dictionary').definitions['2.7.1'];
+const server = hl7.Server;
+const configuration = require('./configuration');
+const _ = require('lodash');
 
 const parser = new hl7.Parser({ segmentSeperator: '\n' });
 const fs = require('fs');
-let tcpClient = server.createTcpClient();
+const tcpClient = server.createTcpClient();
 
+
+console.log(hl7Definitons);
 
 let refreshDestinations = () => {
   let destinations = configuration.readSettings('tcp-destinations');
@@ -193,7 +197,8 @@ let constructMshData = header => {
       return;
     }
     f.value[0].forEach((v, j) => {
-      html += `<tr><td>MSH-${i + 3}.${j + 1}</td><td>${v.value[0]}</td><td>Testing</td></tr>`
+      html += `<tr><td>MSH-${i + 3}.${j + 1}</td><td>${v.value[0]}</td>
+      <td>${hl7Definitons.segments.MSH.fields[i + 2].desc}</td></tr>`
     });
   });
   $('#detailTableMSH tbody').append(html);
@@ -205,30 +210,33 @@ let constructSegmentData = (seg, i) => {
               <tr>
                 <th>Segment</th>
                 <th>Value</th>
-                <th>Standard</th>
+                <th>Definition</th>
               </tr>
             </thead>
             <tbody>`;
   let contentDiv = $(`#SEG${i}`);
-  let fields = seg.fields;
+  let msgFields = seg.fields;
   let name = seg.name;
-  fields.forEach((f, j) => {
+  msgFields.forEach((f, j) => {
     f.value.forEach((v, k) => {
       if (v.value) {
         v.value.forEach((v, m) => {
           v.forEach((c, n) => {
-            html += `<tr><td>${name}-${j + 1}.${k + 1}.${m + 1 + n}</td><td>${c.value[0]}</td><td>Testing</td></tr>`;
+            html += `<tr><td>${name}-${j + 1}.${k + 1}.${m + 1 + n}</td><td>${c.value[0]}</td>
+            <td>${_.get(hl7Definitons.segments, name).fields[j].desc}</td></tr>`;
             return;
-          })
+          });
         });
       }
       if (v.length === 1) {
-        html += `<tr><td>${name}-${j + 1}.${k + 1}</td><td>${v[0].value[0]}</td><td>Testing</td></tr>`;
+        html += `<tr><td>${name}-${j + 1}.${k + 1}</td><td>${v[0].value[0]}</td>
+        <td>${_.get(hl7Definitons.segments, name).fields[j].desc}</td></tr>`;
         return;
       }
       if (v.length > 1) {
         v.forEach((c, l) => {
-          html += `<tr><td>${name}-${j + 1}.${k + 1 + l}</td><td>${c.value[0]}</td><td>Testing</td></tr>`;
+          html += `<tr><td>${name}-${j + 1}.${k + 1 + l}</td><td>${c.value[0]}</td>
+          <td>${_.get(hl7Definitons.segments, name).fields[j].desc}</td></tr>`;
           return;
         })
       }

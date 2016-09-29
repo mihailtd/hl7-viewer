@@ -15,6 +15,7 @@ reference.
 
 * Fixed the send dropdown display and styles. 
 * Dynamically loading the TCP destinatios that you setup in the settings window.
+* Added the 'Definition' column to the details pane. It shows the definiton of each segment from the HL7 standard.
 
 ## Known issues and unfinished features in this beta version:
 
@@ -24,8 +25,6 @@ will not apply the correct formatting. Workaround: ctrl-a, ctrl-c, ctrl-v to rei
 have the formatting reapplied.
 * The details pane table is not editable. This will be editable and the edits will show in the message 
 edit section real time.
-* The 'Standard' column displays a placeholder at the moment. This will display the description of
-the usual value in this field.
 * The light theme will come in a future version.
 * UI scale slider is not implemented yet. Currently the UI elements are big to facilitate high resolution
 screens. In the future there will be a slider to adjust the scale of the UI elements.
