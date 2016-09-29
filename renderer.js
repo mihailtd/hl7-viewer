@@ -17,7 +17,6 @@ const fs = require('fs');
 const tcpClient = server.createTcpClient();
 
 
-console.log(hl7Definitons);
 
 let refreshDestinations = () => {
   let destinations = configuration.readSettings('tcp-destinations');
@@ -34,7 +33,12 @@ let refreshDestinations = () => {
     alertify.success(`Message sent to ${destinations[i].name}`);
   });
 }
+let refreshScale = () => {
+  let uiScale = configuration.readSettings('ui-scale');
+  $('html').css('zoom', uiScale);
+}
 refreshDestinations();
+refreshScale();
 
 class Message {
   constructor() {
@@ -297,5 +301,8 @@ ipcRenderer.on('events', (event, arg) => {
   if (arg === 'settings-close') {
     return refreshDestinations();
     // alertify.success("Settings Saved and Applied");
+  }
+  if (arg === 'settings-change-scale') {
+    return refreshScale();
   }
 });

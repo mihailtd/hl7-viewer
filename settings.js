@@ -5,9 +5,10 @@ const configuration = require('./configuration');
 const alertify = require('alertify.js');
 
 
+
 $(document).ready(() => {
   let theme = configuration.readSettings('theme');
-  let uiScale = configuration.readSettings('ui-scale');
+  let uiScale;
   let destinations;
 
   let t = $('#destinations');
@@ -77,7 +78,24 @@ $(document).ready(() => {
     return el.value === theme;
   }).prop('checked', 'true');
 
-  $('#scale').text(uiScale);
+
+  $('#scale-slider').on("change", function (v) {
+    configuration.saveSettings('ui-scale', $(this).val());
+    refreshScale();
+    setParrentScale();
+  });
+
+  let setParrentScale = () => {
+    ipcRenderer.send('events', 'settings-change-scale');
+  }
+
+  let refreshScale = () => {
+    uiScale = configuration.readSettings('ui-scale');
+    $('html').css('zoom', uiScale);
+    $('#scale-slider').val(uiScale);
+    $('#scale').text(uiScale);
+  }
+  refreshScale();
 
   $('#close').on('click', () => {
     ipcRenderer.send('events', 'settings-close');

@@ -17,7 +17,7 @@
     <input type="radio" name="theme" value="light" disabled="true">
     <label for="light">Light</label>
   </h2>
-  <h2>UI Scale: <span id="scale"></span></h2>
+  <h2>UI Scale: <input id="scale-slider" type="range" min=".5" max="1" step=".1"/> <span id="scale"></span></h2>
   <h2>TCP Destinations: </h2>
   <table id="destinations" class="display" cellspacing="0" width="100%">
         <thead>
@@ -34,6 +34,7 @@
     </table>
 
   <button class="grow_spin" id="close"><i class="fa fa-times" aria-hidden="true"></i> Close</button>
+
 
   <script src="./settings.js"></script>
 </body>

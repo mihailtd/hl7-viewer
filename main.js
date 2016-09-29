@@ -59,6 +59,9 @@ app.on('ready', () => {
       win.webContents.send('events', 'settings-close');
       child.hide();
     }
+    if (arg === 'settings-change-scale') {
+      win.webContents.send('events', 'settings-change-scale');
+    }
   })
 })
 

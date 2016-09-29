@@ -13,9 +13,11 @@ reference.
 
 ## What's new:
 
-* Fixed the send dropdown display and styles. 
 * Dynamically loading the TCP destinatios that you setup in the settings window.
 * Added the 'Definition' column to the details pane. It shows the definiton of each segment from the HL7 standard.
+* This beta version is has builds for all major platforms. No proper installers yet, unpack and run. 
+* UI Scale slider implemented. Change the size of UI elements in real time. No matter if you have a very low res 
+screen or a high res one, you should find the perfect scale to match it. 
 
 ## Known issues and unfinished features in this beta version:
 
@@ -26,10 +28,7 @@ have the formatting reapplied.
 * The details pane table is not editable. This will be editable and the edits will show in the message 
 edit section real time.
 * The light theme will come in a future version.
-* UI scale slider is not implemented yet. Currently the UI elements are big to facilitate high resolution
-screens. In the future there will be a slider to adjust the scale of the UI elements.
-* Proper installers and releases for linux and mac are coming soon. For now the beta version is available 
-only on Windows systems.
+* Proper installers coming soon and auto updates coming soon. 
 
 ## Installation instructions:
 
