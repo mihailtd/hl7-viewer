@@ -32,8 +32,8 @@ edit section real time.
 
 ## Installation instructions:
 
-* Download the .rar [file](./packages/).
-* Extract to a folder.
+* Download the .rar [file](https://github.com/farcasmihai91/hl7-viewer/releases/tag/0.9.3).
+* Extract it.
 * Run `hl7-viewer.exe`.
 * This version does not yet have automatic updates. Make sure to check this repo regurarly for 
 possible updates.

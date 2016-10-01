@@ -367,3 +367,8 @@ input[type=range]::-webkit-slider-runnable-track {
 input[type=range]:focus::-webkit-slider-runnable-track {
   background: var(--main-link-button-color);
 }
+
+.button-edit, .button-copy, .button-edit-accept, .button-edit-cancel {
+  zoom: 0.5;
+  margin: 0 0 0 0;
+}

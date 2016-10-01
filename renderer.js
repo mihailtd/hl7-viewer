@@ -15,7 +15,7 @@ const _ = require('lodash');
 const parser = new hl7.Parser({ segmentSeperator: '\n' });
 const fs = require('fs');
 const tcpClient = server.createTcpClient();
-
+alertify.maxLogItems(10);
 
 
 let refreshDestinations = () => {
@@ -28,9 +28,14 @@ let refreshDestinations = () => {
   $('.dropdown-content').html(html);
   $('.dropdown-content').find('a').on('click', function (event) {
     let i = $(this).data('destination');
+
     tcpClient.connect(destinations[i].ip, destinations[i].port);
-    tcpClient.send(msg.text);
+    tcpClient.client.on('error', err => {
+      return alertify.error(`${err}`);
+    });
+    tcpClient.send(msg.parse().toString() + '\n');
     alertify.success(`Message sent to ${destinations[i].name}`);
+    tcpClient.close(msg.parse().toString() === msg.text);
   });
 }
 let refreshScale = () => {
@@ -100,6 +105,15 @@ let addEvents = (segments) => {
   });
 }
 
+$('.tabs').on('DOMSubtreeModified', () => {
+  $('#detailTableMSH').find("div[contenteditable='true']").on('keyup', function (event) {
+    event.stopImmediatePropagation();
+    let val = $(this).text();
+    
+    setMessageSegmentValue(msg, 'PID', 1, 'testing')
+  });
+});
+
 let setActive = (i) => {
   if (!i) {
     i = 0;
@@ -122,8 +136,16 @@ let refreshViews = () => {
   });
 }
 
-let setMessageSegmentValue = (msg, seg, val) => {
+let setMessageSegmentValue = (msg, seg, field, val) => {
+  let parsedMsg = msg.parse();
+  parsedMsg.getSegment(seg).editField(field, val);
 
+  let text = parsedMsg.toString();
+  msg.text = text;
+  messageBox.children().remove();
+  messageBox.html(formatHl7(text));
+  refreshViews();
+  removeEmptyParagraphs(messageBox);
 }
 
 let getTextFromMessageBox = () => {
@@ -201,11 +223,22 @@ let constructMshData = header => {
       return;
     }
     f.value[0].forEach((v, j) => {
-      html += `<tr><td>MSH-${i + 3}.${j + 1}</td><td>${v.value[0]}</td>
-      <td>${hl7Definitons.segments.MSH.fields[i + 2].desc}</td></tr>`
+      html += `<tr>
+      <td data-column="segment">MSH-${i + 3}.${j + 1}</td>
+      <td data-column="value"><div>${v.value[0]}</div></td>
+      <td data-ccolumn="definition">${hl7Definitons.segments.MSH.fields[i + 2].desc}</td>
+      <td data-ccolumn="actions">
+        <button class="grow_spin button-edit" data-segment="MSH"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+        <button class="grow_spin button-copy"><i class="fa fa-copy" aria-hidden="true"></i></button>
+        <button class="grow_spin button-edit-accept"><i class="fa fa-check" aria-hidden="true"></i></button>
+        <button class="grow_spin button-edit-cancel"><i class="fa fa-ban" aria-hidden="true"></i></button>
+      </td></tr>`
     });
   });
   $('#detailTableMSH tbody').append(html);
+  $('.button-edit-accept').hide();
+  $('.button-edit-cancel').hide();
+  addEventsToButtons();
 }
 
 let constructSegmentData = (seg, i) => {
@@ -226,20 +259,20 @@ let constructSegmentData = (seg, i) => {
       if (v.value) {
         v.value.forEach((v, m) => {
           v.forEach((c, n) => {
-            html += `<tr><td>${name}-${j + 1}.${k + 1}.${m + 1 + n}</td><td>${c.value[0]}</td>
+            html += `<tr><td>${name}-${j + 1}.${k + 1}.${m + 1 + n}</td><td><div contenteditable="true">${c.value[0]}</div></td>
             <td>${_.get(hl7Definitons.segments, name).fields[j].desc}</td></tr>`;
             return;
           });
         });
       }
       if (v.length === 1) {
-        html += `<tr><td>${name}-${j + 1}.${k + 1}</td><td>${v[0].value[0]}</td>
+        html += `<tr><td>${name}-${j + 1}.${k + 1}</td><td><div contenteditable="true">${v[0].value[0]}</div></td>
         <td>${_.get(hl7Definitons.segments, name).fields[j].desc}</td></tr>`;
         return;
       }
       if (v.length > 1) {
         v.forEach((c, l) => {
-          html += `<tr><td>${name}-${j + 1}.${k + 1 + l}</td><td>${c.value[0]}</td>
+          html += `<tr><td>${name}-${j + 1}.${k + 1 + l}</td><td><div contenteditable="true">${c.value[0]}</div></td>
           <td>${_.get(hl7Definitons.segments, name).fields[j].desc}</td></tr>`;
           return;
         })
@@ -306,3 +339,22 @@ ipcRenderer.on('events', (event, arg) => {
     return refreshScale();
   }
 });
+
+
+let addEventsToButtons = () => {
+  $('.button-edit').on('click', function() {
+    let valueColumn = $(this).parent().siblings().filter( function () { return $(this).data('column') === 'value' });
+    valueColumn.attr('contenteditable','true');
+    $(this).hide();
+    $(this).siblings('.button-copy').hide();
+    $(this).siblings('.button-edit-accept').show();
+    $(this).siblings('.button-edit-cancel').show();
+    let value = valueColumn.text();
+  });
+
+  $('.button-copy').on('click', function() {
+    let value = $(this).parent().siblings().filter( function () { return $(this).data('column') === 'value' }).text();
+    clipboard.writeText(value);
+    alertify.success(`"${value}" copied to clipboard!`);
+  });
+}

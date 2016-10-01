@@ -1,6 +1,8 @@
 'use strict';
 const {ipcRenderer} = require('electron');
 const $ = require('jquery');
+const jQuery = require('jquery');
+const mask = require('./jquery.mask.min');
 const configuration = require('./configuration');
 const alertify = require('alertify.js');
 
@@ -35,7 +37,7 @@ $(document).ready(() => {
     //   alertify.success("Edit Successful");
     // });
     $('.delete').on('click', function () {
-      let index = $(this).data('data-destination');
+      let index = $(this).data('destination');
       destinations.splice(index, 1);
       configuration.saveSettings('tcp-destinations', destinations);
       refreshDestinations();
@@ -99,6 +101,15 @@ $(document).ready(() => {
 
   $('#close').on('click', () => {
     ipcRenderer.send('events', 'settings-close');
+  });
+
+
+  $('#destination-ip').mask('0ZZ.0ZZ.0ZZ.0ZZ', {
+    translation: {
+      'Z': {
+        pattern: /[0-9]/, optional: true
+      }
+    }
   });
 });
 
